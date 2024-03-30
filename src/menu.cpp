@@ -1,7 +1,7 @@
 #include "menu.hpp"
 #include <QFont>
-MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), menuPixmap("../img/menu/Menu.png") {
-    setFixedSize(700, 600);
+MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), menuPixmap("./img/menu/Menu.png") {
+    setFixedSize(600, 600);
 }
 
 void MainWindow::paintEvent(QPaintEvent *event) {
@@ -14,13 +14,10 @@ void MainWindow::paintEvent(QPaintEvent *event) {
     font.setPointSize(12);
     painter.setFont(font);
 
-    font.setPointSize(25);
+    font.setPointSize(20);
     painter.setFont(font);
-    QRect rectSecondLine(0, 1 * height() / 4 + 30, width(), height() / 2);
-    painter.drawText(rectSecondLine, Qt::AlignCenter, "HDU-CS");
-
-    QRect rectFirstLine(0, height() / 4, width(), height() / 2);
-    painter.drawText(rectFirstLine, Qt::AlignCenter, "本游戏由BoneInscri制作！");
+    QRect rectSecondLine(0, height() / 64, width(), 40);
+    painter.drawText(rectSecondLine, Qt::AlignCenter, "Made by HDU-CS BoneInscri");
 }
 
 void MainWindow::mousePressEvent(QMouseEvent *event) {
