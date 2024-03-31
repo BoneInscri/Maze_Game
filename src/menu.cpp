@@ -1,48 +1,76 @@
 #include "menu.hpp"
-#include <QFont>
-MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), menuPixmap("./img/menu/Menu.png") {
+
+MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), menuPixmap("./img/menu/Menu.png")
+{
     setFixedSize(600, 600);
+    // 初始化按钮，并设置它们的文本和位置
+    startGameButton = new QPushButton("开始游戏", this);
+    choosePlayerButton = new QPushButton("选择角色", this);
+    aboutButton = new QPushButton("相关信息", this);
+    exitButton = new QPushButton("退出游戏", this);
+
+    choosePlayerWidget = new ChoosePlayerWidget(this);
+    
+    int buttonWidth = 192;
+    int buttonHeight = 48;
+    int firstButtonY = 316;
+    int buttonSpacing = buttonHeight;
+
+    startGameButton->setGeometry(224, firstButtonY, buttonWidth, buttonHeight);
+    choosePlayerButton->setGeometry(224, firstButtonY + buttonSpacing, buttonWidth, buttonHeight);
+    aboutButton->setGeometry(224, firstButtonY + 2 * buttonSpacing, buttonWidth, buttonHeight);
+    exitButton->setGeometry(224, firstButtonY + 3 * buttonSpacing, buttonWidth, buttonHeight);
+
+    // 连接信号和槽
+    connect(startGameButton, &QPushButton::clicked, this, &MainWindow::gameBegin);
+    connect(choosePlayerButton, &QPushButton::clicked, this, &MainWindow::showChoosePlayerWidget);
+    connect(aboutButton, &QPushButton::clicked, this, &MainWindow::About);
+    connect(exitButton, &QPushButton::clicked, this, &MainWindow::exitGame);
+
+    choosePlayerWidget->hide();
 }
 
-void MainWindow::paintEvent(QPaintEvent *event) {
+void MainWindow::paintEvent(QPaintEvent *)
+{
     QPainter painter(this);
-    painter.drawPixmap(0, 0, menuPixmap);
-    
+    painter.drawPixmap(0, 0, menuPixmap); // 绘制背景图
+
+    // 设置初始字体
     painter.setPen(Qt::red);
     QFont font = painter.font();
     font.setFamily("宋体");
-    font.setPointSize(12);
-    painter.setFont(font);
+    font.setPointSize(12); // 假设这是初始设置，如果只需要一种大小，则不需要再次设置
 
-    font.setPointSize(20);
-    painter.setFont(font);
-    QRect rectSecondLine(0, height() / 64, width(), 40);
-    painter.drawText(rectSecondLine, Qt::AlignCenter, "Made by HDU-CS BoneInscri");
+    {
+        QFont tempFont = font; // 复制当前设置
+        tempFont.setPointSize(20); // 调整大小
+        painter.setFont(tempFont); // 应用到painter
+
+        // 绘制文本
+        QRect rectSecondLine(0, height() / 64, width(), 40);
+        painter.drawText(rectSecondLine, Qt::AlignCenter, tr("Made by HDU-CS BoneInscri"));
+    }
 }
 
-void MainWindow::mousePressEvent(QMouseEvent *event) {
-    int x = event->x();
-    int y = event->y();
-    if (event->button() == Qt::LeftButton) {
-        // 开始游戏
-        if (x >= 254 && x <= 443 && y >= 326 && y <= 374) {
-            // 关闭当前窗口或清除当前界面
-            // gameBegin(); // 这里调用开始游戏的函数
-        }
-        // 选择角色
-        else if (x >= 254 && x <= 445 && y >= 374 && y <= 411) {
-            // choosePlayer(); // 这里调用选择角色的函数
-            // 回到菜单（或者更新界面）
-        }
-        // 相关信息
-        else if (x >= 254 && x <= 444 && y >= 412 && y <= 447) {
-            // About(); // 这里调用显示相关信息的函数
-            // 回到菜单（或者更新界面）
-        }
-        // 退出游戏
-        else if (x >= 253 && x <= 445 && y >= 451 && y <= 484) {
-            // closegraph(); // 在Qt中，可能是关闭窗口
-            this->close(); // 关闭当前窗口
-        }
-    }
+void MainWindow::gameBegin()
+{
+    // 实现开始游戏的逻辑
+}
+
+void MainWindow::showChoosePlayerWidget() {
+    choosePlayerWidget->show();
+}
+
+void MainWindow::About()
+{
+    QMessageBox::about(this, tr("关于游戏"), 
+        tr("<h2>迷宫闯关游戏 1.0</h2>"
+           "<p>版权 &copy; 2024 BoneInscri</p>"
+           "<p>游戏名称是一个经典的迷宫闯关游戏，每个关卡需要躲避怪兽在限制的时间内到达终点，并支持自动寻路躲避怪兽到达终点。 </p>"
+           "<p>本游戏由 HDU BoneInscri 开发，感谢您的支持！</p>"
+           ));
+}
+void MainWindow::exitGame()
+{
+    this->close();
 }

@@ -2,7 +2,7 @@
 
 这是一个迷宫小游戏，可以在Linux下运行。
 
-图形库通过Qt创建。
+本身是大一程序设计实践大作业在Windows下用EasyX写的一个小游戏，且原先是使用在C语法基础上使用了部分的C++SLT模板，但考虑到之后的开发都在Linux下进行开发，故将代码整理了一下，转化为了Qt的C++版本，真打赢复活赛了。
 
 ### 环境搭建
 
@@ -74,6 +74,16 @@ C/C++: Edit Configurations (UI)，进入c_cpp_properties.json文件
 "/usr/include/x86_64-linux-gnu/qt5/QtWidgets"
 ```
 
+如何使用Qt Designer进行UI设计？
+
+```
+$ sudo apt-get install qttools5-dev-tools
+$ designer
+```
+
+
+
+
 
 ### 项目构建并运行
 
@@ -87,3 +97,8 @@ sh run.sh
 ```
 sh clean.sh
 ```
+
+
+
+### 游戏效果
+
