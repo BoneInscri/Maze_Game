@@ -37,10 +37,11 @@ enum DIR
 
 enum GameState
 {
-  NotStarted,    // 还未开始 0
-  InGame,        // 正在游戏 1
-  LevelComplete, // 游戏过关 2
-  GameOver       // 游戏失败 3
+  NotStarted, // 还未开始 0
+  GameIng,    // 正在游戏 1
+  GamePause,  // 游戏暂停 2
+  GameOver,   // 游戏失败 3
+  GameSuccess // 闯关成功4
 };
 
 struct Node
@@ -58,8 +59,9 @@ class GameWidget : public QWidget
   Q_OBJECT
 
 public:
-  explicit GameWidget(QWidget *parent = nullptr);
+  explicit GameWidget(int WIDTH, int HEIGHT, QWidget *parent = nullptr);
   GameState gameState = NotStarted; // 游戏状态
+  void gameInit();
   void gameBegin();
   void setPlayerType(int type);
 
@@ -68,36 +70,52 @@ protected:
   void keyPressEvent(QKeyEvent *event) override;
 
 private:
+  int Window_Width, Window_Height;
   void loadMap(const QString &fileName);
   void loadImages();
   void loadBGM(const QString &fileName);
-  void MonstersMove();
   void MovePlayer();
   void LifeReduce();
   void gameOver();
-  // void checkCollisions();
-  // void drawGame();
+  void gameDraw();
+  void drawGameInfo(QPainter &painter);
+  void drawGameMap(QPainter &painter);
+  void gameAuto();
+  void gamePause();
+  void gameExit();
+  void gameWin();
+
+
+  QPushButton *AutoButton;
+  QPushButton *PauseButton;
+  QPushButton *ExitButton;
 
   static const int MAP_MAX_SIZE = 2000;
   static const int MONSTERS_MAX_NUM = 10;
-  static const int GRID_SIZE = 25; // 每一个方格的大小
-  static const int Level_NUM = 2;  // 关卡数
+  static const int LIFE_IMAGE_SIZE = 60;
+  static const int TIME_DIGIST_SIZE = 60;
+  static const int MONSTER_SPEED = 250;
+  static const int Level_NUM = 2; // 关卡数
+
   const QString mapFiles[2] = {"./map/map1.txt", "./map/map2.txt"};
 
   int Mp[MAP_MAX_SIZE][MAP_MAX_SIZE]; // 地图矩阵
-  int LIFE = 5;                       // 动态生命值
+  int LIFE;                           // 动态生命值
   int m;                              // 怪物数量
   int ROW, COL;                       // 行与列
   int WIDTH, HEIGHT;                  // 像素的宽与高
+  int GRID_SIZE = 30;                 // 每一个方格的大小，根据地图的大小可以动态调节，让左侧的2/3区域填满迷宫地图
   int TIME;                           // 起始时间值
   int Time;                           // 动态时间值
-  int Current_Level = 1;              // 当前关卡
+  int Current_Level;                  // 当前关卡
+
+  int preLIFE; // 自动寻路前的生命值
+  int preTime; // 自动寻路前的时间
 
   Node Player;
   Node Pre_Player;
   Node Start;
   Node Monsters[MONSTERS_MAX_NUM];
-
 
   QPixmap LIFE_IMAGE;        // life image
   QPixmap NUMBERS_IMAGE[10]; // 十个数字图片
@@ -109,19 +127,13 @@ private:
 
   QMediaPlayer *bgmPlayer;
   QTimer *timer;
+  QTimer *countdown;
+  QTimer *monstersTimer;
 
 private slots:
   void updateGameState();
-
-  // int preLIFE;
-  // int preTime;   // 自动前的时间和生命值
-  // int flag = 1;  // 打开游戏后的状态
-
-  //   void gameOver();
-  //   void gamePerfect();
-  //   void gameWin();
-  //   void FindRoad();
-  //   void Autogame();
+  void TimeCountDown();
+  void MonstersMove();
 };
 
 #endif // _GAMEWIDGET_H_

@@ -14,7 +14,7 @@
 class MainWindow : public QMainWindow {
     Q_OBJECT
 public:
-    explicit MainWindow(QWidget *parent = nullptr);
+    explicit MainWindow(int WIDTH, int HEIGHT, QWidget *parent = nullptr);
     ChoosePlayerWidget* choosePlayerWidget;
     GameWidget *gameWidget;
 
@@ -28,6 +28,7 @@ private slots:
     void exitGame();
 
 private:
+    int Window_Width, Window_Height;
     QPixmap menuPixmap;
 
     QPushButton *startGameButton;

@@ -14,7 +14,7 @@ class ChoosePlayerWidget : public QWidget
     Q_OBJECT
 
 public:
-    explicit ChoosePlayerWidget(QWidget *parent = nullptr);
+    explicit ChoosePlayerWidget(int WIDTH, int HEIGHT, QWidget *parent = nullptr);
 
 protected:
     void paintEvent(QPaintEvent *event) override;

@@ -2,9 +2,9 @@
 
 const char* ChoosePlayerWidget::name[] = {"黄菊之臣", "火焰猫灵", "绿风之叶", "狂暴拳手", "勇猛剑士", "激光枪手"};
 
-ChoosePlayerWidget::ChoosePlayerWidget(QWidget *parent) : QWidget(parent)
+ChoosePlayerWidget::ChoosePlayerWidget(int WIDTH, int HEIGHT, QWidget *parent) : QWidget(parent) 
 {
-    setFixedSize(600, 600);
+    setFixedSize(WIDTH, HEIGHT);
     setupUI();
 }
 
