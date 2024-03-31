@@ -15,6 +15,7 @@
 #include <QDebug>
 #include <QMediaPlayer>
 #include <QFileInfo>
+#include <QTimer>
 
 enum CellType
 {
@@ -42,27 +43,38 @@ enum GameState
   GameOver       // 游戏失败 3
 };
 
+struct Node
+{
+  int r, c;
+  int dir;
+  int type;
+};
+
+Node MoveNode(Node curr);
+int getOppositeDirection(int dir);
+
 class GameWidget : public QWidget
 {
   Q_OBJECT
 
 public:
   explicit GameWidget(QWidget *parent = nullptr);
-  GameState gameState = NotStarted;   // 游戏状态
+  GameState gameState = NotStarted; // 游戏状态
   void gameBegin();
+  void setPlayerType(int type);
 
 protected:
   void paintEvent(QPaintEvent *event) override;
-  // void keyPressEvent(QKeyEvent *event) override;
+  void keyPressEvent(QKeyEvent *event) override;
 
 private:
   void loadMap(const QString &fileName);
   void loadImages();
   void loadBGM(const QString &fileName);
-
-
-  // void movePlayer(int dx, int dy);
-  // void moveMonster();
+  void MonstersMove();
+  void MovePlayer();
+  void LifeReduce();
+  void gameOver();
   // void checkCollisions();
   // void drawGame();
 
@@ -81,16 +93,11 @@ private:
   int Time;                           // 动态时间值
   int Current_Level = 1;              // 当前关卡
 
-  struct Node
-  {
-    int r, c;
-    int dir;
-    int type;
-  };
   Node Player;
   Node Pre_Player;
   Node Start;
   Node Monsters[MONSTERS_MAX_NUM];
+
 
   QPixmap LIFE_IMAGE;        // life image
   QPixmap NUMBERS_IMAGE[10]; // 十个数字图片
@@ -101,19 +108,20 @@ private:
   QPixmap END_IMAGE;         // 终点的图片
 
   QMediaPlayer *bgmPlayer;
+  QTimer *timer;
+
+private slots:
+  void updateGameState();
 
   // int preLIFE;
   // int preTime;   // 自动前的时间和生命值
   // int flag = 1;  // 打开游戏后的状态
-  // QTimer *timer;
-
 
   //   void gameOver();
   //   void gamePerfect();
   //   void gameWin();
   //   void FindRoad();
   //   void Autogame();
-
 };
 
 #endif // _GAMEWIDGET_H_

@@ -79,10 +79,9 @@ void ChoosePlayerWidget::updatePlayerImage()
 {
     // Load the current player's image
     QString imagePath = QString("./img/player/player%1.png").arg(currentItem + 1);
-    QPixmap pixmap;
-    if (pixmap.load(imagePath))
+    if (this->playerPixmap.load(imagePath))
     {
-        playerLabel->setPixmap(pixmap.scaled(310, 270, Qt::KeepAspectRatio, Qt::SmoothTransformation));
+        playerLabel->setPixmap(this->playerPixmap.scaled(310, 270, Qt::KeepAspectRatio, Qt::SmoothTransformation));
     }
     else
     {
@@ -92,8 +91,10 @@ void ChoosePlayerWidget::updatePlayerImage()
     nameLabel->setText(QString::fromUtf8(name[currentItem]));
 }
 
+extern int Player_type_global;
 void ChoosePlayerWidget::finalizeSelection()
 {
     emit characterChosen(currentItem);
     this->hide();
+    Player_type_global = currentItem + 1;
 }

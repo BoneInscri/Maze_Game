@@ -10,10 +10,13 @@
 #include "ChoosePlayerWidget.hpp"
 #include "GameWidget.hpp"
 
+ 
 class MainWindow : public QMainWindow {
     Q_OBJECT
 public:
     explicit MainWindow(QWidget *parent = nullptr);
+    ChoosePlayerWidget* choosePlayerWidget;
+    GameWidget *gameWidget;
 
 protected:
     void paintEvent(QPaintEvent *event) override;
@@ -31,9 +34,6 @@ private:
     QPushButton *choosePlayerButton;
     QPushButton *aboutButton;
     QPushButton *exitButton;
-    
-    ChoosePlayerWidget* choosePlayerWidget;
-    GameWidget *gameWidget;
 };
 
 #endif // _MENU_H_
