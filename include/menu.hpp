@@ -8,6 +8,7 @@
 #include <QMessageBox>
 
 #include "ChoosePlayerWidget.hpp"
+#include "GameWidget.hpp"
 
 class MainWindow : public QMainWindow {
     Q_OBJECT
@@ -32,6 +33,7 @@ private:
     QPushButton *exitButton;
     
     ChoosePlayerWidget* choosePlayerWidget;
+    GameWidget *gameWidget;
 };
 
 #endif // _MENU_H_

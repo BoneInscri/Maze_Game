@@ -9,7 +9,11 @@
 Ubuntu下安装QT依赖
 
 ```
-sudo apt-get install qtbase5-dev qt5-qmake libqt5widgets5
+sudo apt-get install qtbase5-dev qt5-qmake libqt5widgets5 qtmultimedia5-dev 
+sudo apt-get install libgstreamer1.0-0 gstreamer1.0-plugins-base gstreamer1.0-plugins-good gstreamer1.0-plugins-bad gstreamer1.0-plugins-ugly
+sudo apt-get install libqt5multimedia5-plugins
+apt-get install libgstreamer1.0-dev libgstreamer-plugins-base1.0-dev libgstreamer-plugins-bad1.0-dev gstreamer1.0-plugins-base gstreamer1.0-plugins-good gstreamer1.0-plugins-bad gstreamer1.0-plugins-ugly gstreamer1.0-libav gstreamer1.0-tools gstreamer1.0-x gstreamer1.0-alsa gstreamer1.0-gl gstreamer1.0-gtk3 gstreamer1.0-qt5 gstreamer1.0-pulseaudio
+gst-inspect-1.0 --version
 ```
 
 使用 `qmake -v` 找到qmake在哪里？
@@ -83,6 +87,12 @@ $ designer
 
 
 
+**Vscode 插件**
+
+C/C++ Extension Pack
+
+<img src="README.assets/image-20240331094825538.png" alt="image-20240331094825538" style="zoom: 67%;" />
+
 
 
 ### 项目构建并运行
@@ -97,6 +107,15 @@ sh run.sh
 ```
 sh clean.sh
 ```
+
+
+
+#### map.txt的格式说明
+
+- ROW COL TIME
+- Map data
+- number of monsters
+- information of monsters : pos + dir
 
 
 

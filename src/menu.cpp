@@ -10,7 +10,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), menuPixmap("./img
     exitButton = new QPushButton("退出游戏", this);
 
     choosePlayerWidget = new ChoosePlayerWidget(this);
-    
+    gameWidget = new GameWidget(this);
+
     int buttonWidth = 192;
     int buttonHeight = 48;
     int firstButtonY = 316;
@@ -28,6 +29,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), menuPixmap("./img
     connect(exitButton, &QPushButton::clicked, this, &MainWindow::exitGame);
 
     choosePlayerWidget->hide();
+    gameWidget->hide();
 }
 
 void MainWindow::paintEvent(QPaintEvent *)
@@ -54,7 +56,9 @@ void MainWindow::paintEvent(QPaintEvent *)
 
 void MainWindow::gameBegin()
 {
-    // 实现开始游戏的逻辑
+    gameWidget->show();
+    gameWidget->gameState = GameState::InGame;
+    gameWidget->gameBegin();
 }
 
 void MainWindow::showChoosePlayerWidget() {
