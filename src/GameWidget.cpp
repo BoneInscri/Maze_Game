@@ -22,6 +22,8 @@ GameWidget::GameWidget(int WIDTH, int HEIGHT, QWidget *parent) : QWidget(parent)
   connect(monstersTimer, &QTimer::timeout, this, &GameWidget::MonstersMove); // 怪兽移动
 
   setFocusPolicy(Qt::StrongFocus);
+
+  loadImages();
 }
 
 void GameWidget::paintEvent(QPaintEvent *)
@@ -37,19 +39,20 @@ void GameWidget::paintEvent(QPaintEvent *)
   case GameIng:
   case GamePause:
     gameDraw();
+
     break;
   case GameOver:
     this->hide();
     break;
   case GameSuccess:
     Current_Level++;
-    if(Current_Level > Level_NUM) {
+    if (Current_Level > Level_NUM)
+    {
       gameWin();
     }
     else
     {
-      gameState = GameState::GameIng;
-      gameBegin();
+      gameSuccess();
     }
     break;
   default:
@@ -255,6 +258,15 @@ void GameWidget::loadMap(const QString &fileName)
   int maxCellWidth = (Window_Width * 2 / 3) / COL;
   int maxCellHeight = Window_Height / ROW;
   GRID_SIZE = qMin(maxCellWidth, maxCellHeight);
+
+  // generate random monsters
+  srand(time(0));
+  for (int i = 0; i < m; i++)
+  {
+    int x = rand() % 6 + 1;
+    Monsters[i].type = x;
+    // qDebug() << "monsters type :" << Monsters[i].type;
+  }
   file.close();
 }
 
@@ -265,7 +277,6 @@ void GameWidget::loadImages()
   const QString monstersPath = "./img/monster/";
 
   LIFE_IMAGE.load(imgPath + "life.png");
-  LIFE_IMAGE = LIFE_IMAGE.scaled(54, 50);
   KEY_IMAGE.load(imgPath + "key.png");
   KEY_IMAGE = KEY_IMAGE.scaled(WIDTH / 3 + 30, HEIGHT / 8 + 30);
   START_IMAGE.load(imgPath + "start.png");
@@ -284,14 +295,6 @@ void GameWidget::loadImages()
     MONSTERS_IMAGE[i].load(monstersPath + "monster" + QString::number(i) + ".png");
     MONSTERS_IMAGE[i] = MONSTERS_IMAGE[i].scaled(GRID_SIZE, GRID_SIZE);
   }
-
-  srand(time(0));
-  for (int i = 0; i < m; i++)
-  {
-    int x = rand() % 6 + 1;
-    Monsters[i].type = x;
-    // qDebug() << "monsters type :" << Monsters[i].type;
-  }
 }
 
 extern int Player_type_global;
@@ -301,8 +304,6 @@ void GameWidget::gameBegin()
   const QString musicPath = "./music/";
 
   loadMap(mapFiles[Current_Level - 1]);
-  loadImages();
-
 
   Player.type = 1;
   Player.type = Player_type_global;
@@ -312,12 +313,11 @@ void GameWidget::gameBegin()
   loadBGM(musicPath + "BGM" + QString::number(Current_Level) + ".mp3");
 
   PLAYER_IMAGE.load(playerPath + "player" + QString::number(Player.type) + ".png");
+
   PLAYER_IMAGE = PLAYER_IMAGE.scaled(GRID_SIZE - 2, GRID_SIZE - 2);
 
-  timer->start(16);       // 假设每16ms更新一次游戏状态，约等于60FPS
   countdown->start(1000); // 设置定时器每1000毫秒（1秒）触发一次
   monstersTimer->start(MONSTER_SPEED);
-
 }
 
 void GameWidget::loadBGM(const QString &fileName)
@@ -336,6 +336,7 @@ void GameWidget::gameDraw()
   painter.fillRect(this->rect(), Qt::white);
 
   drawGameInfo(painter);
+
   drawGameMap(painter);
 }
 
@@ -419,12 +420,13 @@ void GameWidget::drawGameInfo(QPainter &painter)
   // 绘制生命值
   painter.drawText(INFO_AREA_START_X + 20, yPos, "当前生命值为：");
   yPos += 30;
+
   for (int i = 0; i < LIFE; ++i)
   {
-    painter.drawPixmap(INFO_AREA_START_X + 20 + i * 70, yPos, LIFE_IMAGE.scaled(LIFE_IMAGE_SIZE, LIFE_IMAGE_SIZE));
+    painter.drawPixmap(INFO_AREA_START_X + 20 + i * 70, yPos, LIFE_IMAGE);
   }
-  yPos += 100; // 根据图标大小调整间距
 
+  yPos += 100; // 根据图标大小调整间距
   // 绘制剩余时间
   painter.drawText(INFO_AREA_START_X + 20, yPos, "剩余时间为：");
   yPos += 30;
@@ -524,7 +526,7 @@ void GameWidget::drawGameMap(QPainter &painter)
 void GameWidget::gameWin()
 {
   QMessageBox::about(this, tr("游戏通关"),
-                    tr("<h2>祝贺你！</h2>"));
+                     tr("<h2>祝贺你！</h2>"));
   assert(bgmPlayer);
   assert(countdown);
   assert(monstersTimer);
@@ -539,5 +541,13 @@ void GameWidget::gameInit()
 {
   LIFE = 5;
   Current_Level = 1;
+  gameState = GameState::GameIng;
+  timer->start(16);
+}
+
+void GameWidget::gameSuccess()
+{
+  QMessageBox::about(this, tr("闯关成功"),
+                     tr("<h2>点击进入下一关</h2>"));
   gameState = GameState::GameIng;
 }

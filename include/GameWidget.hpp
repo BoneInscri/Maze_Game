@@ -84,7 +84,7 @@ private:
   void gamePause();
   void gameExit();
   void gameWin();
-
+  void gameSuccess();
 
   QPushButton *AutoButton;
   QPushButton *PauseButton;

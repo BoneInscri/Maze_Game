@@ -29,7 +29,7 @@ MainWindow::MainWindow(int WIDTH, int HEIGHT, QWidget *parent) : QMainWindow(par
     exitButton->setGeometry(buttonsCenterX, firstButtonY + 3 * buttonSpacing, buttonWidth, buttonHeight);
 
     // 连接信号和槽
-    connect(startGameButton, &QPushButton::clicked, this, &MainWindow::gameBegin);
+    connect(startGameButton, &QPushButton::clicked, this, &MainWindow::gameStart);
     connect(choosePlayerButton, &QPushButton::clicked, this, &MainWindow::showChoosePlayerWidget);
     connect(aboutButton, &QPushButton::clicked, this, &MainWindow::About);
     connect(exitButton, &QPushButton::clicked, this, &MainWindow::exitGame);
@@ -60,7 +60,7 @@ void MainWindow::paintEvent(QPaintEvent *)
     }
 }
 
-void MainWindow::gameBegin()
+void MainWindow::gameStart()
 {
     gameWidget->show();
     gameWidget->gameInit();
