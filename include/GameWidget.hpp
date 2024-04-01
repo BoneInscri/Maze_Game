@@ -92,6 +92,7 @@ private:
   void gameSuccess();
   void AutoFindWay();
   void AutoMove();
+  void gameContinue();
 
   QPushButton *AutoButton;
   QPushButton *PauseButton;
@@ -115,12 +116,13 @@ private:
   int TIME;                           // 起始时间值
   int Time;                           // 动态时间值
   int Current_Level;                  // 当前关卡
+  int cur = 1;
 
   int preLIFE; // 自动寻路前的生命值
   int preTime; // 自动寻路前的时间
 
   Node Player;
-  Node Pre_Player;
+  Node pre_Player;
   Node Start;
   Node Exit;
   Node Monsters[MONSTERS_MAX_NUM];

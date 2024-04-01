@@ -464,6 +464,31 @@ void GameWidget::AutoFindWay()
   return;
 }
 
+// 从自动游戏恢复到手动操作
+void GameWidget::gameContinue()
+{
+  autoTimer->stop();
+  // restore game state
+  LIFE = preLIFE;
+  Time = preTime;
+  Player = pre_Player;
+  Mp[Player.r][Player.c] = PLAYER;
+  for (int i = 0; i < m; ++i)
+  {
+    Mp[Monsters[i].r][Monsters[i].c] = SPACE;
+    Monsters[i] = Monsters_cpy[i];
+    Mp[Monsters[i].r][Monsters[i].c] = MONSTER;
+  }
+  cur = 0;
+
+  Mp[AutoPoint.r][AutoPoint.c] = SPACE;
+  countdown->start(1000);
+  monstersTimer->start(MONSTER_SPEED);
+
+  AutoButton->setText("自动寻路");
+  gameState = GameIng;
+}
+
 void GameWidget::gameAuto()
 {
   if (gameState == GameIng)
@@ -471,6 +496,8 @@ void GameWidget::gameAuto()
     // save game State
     preLIFE = LIFE;
     preTime = Time;
+    pre_Player = Player;
+    Mp[Player.r][Player.c] = SPACE;
     for (int i = 0; i < m; ++i)
     {
       Monsters_cpy[i] = Monsters[i];
@@ -488,38 +515,20 @@ void GameWidget::gameAuto()
   }
   else if (gameState == GameAuto)
   {
-    AutoButton->setText("自动游戏");
+    gameContinue();
   }
 }
 
 void GameWidget::AutoMove()
 {
   // qDebug() << "AutoMove";
-  static int cur = 1;
   Mp[AutoPoint.r][AutoPoint.c] = SPACE;
   AutoPoint = Road[cur++];
   Mp[AutoPoint.r][AutoPoint.c] = AUTO;
   MonstersMove();
   if (cur == path_len)
   {
-    autoTimer->stop();
-    // restore game state
-    LIFE = preLIFE;
-    Time = preTime;
-    for (int i = 0; i < m; ++i)
-    {
-      Mp[Monsters[i].r][Monsters[i].c] = SPACE;
-      Monsters[i] = Monsters_cpy[i];
-      Mp[Monsters[i].r][Monsters[i].c] = MONSTER;
-    }
-    cur = 0;
-    
-    Mp[AutoPoint.r][AutoPoint.c] = SPACE;
-    countdown->start(1000);
-    monstersTimer->start(MONSTER_SPEED);
-    
-    AutoButton->setText("自动寻路");
-    gameState = GameIng;
+    gameContinue();
   }
 }
 
