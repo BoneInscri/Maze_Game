@@ -38,7 +38,7 @@ void GameWidget::paintEvent(QPaintEvent *)
   {
   case GameIng:
   case GamePause:
-    gameDraw();
+    gameDraw(painter);
 
     break;
   case GameOver:
@@ -60,6 +60,8 @@ void GameWidget::paintEvent(QPaintEvent *)
     exit(0);
     break;
   }
+
+  painter.end();
 }
 
 void GameWidget::keyPressEvent(QKeyEvent *event)
@@ -139,7 +141,7 @@ void GameWidget::gameOver()
 {
   gameState = GameOver;
   QMessageBox::about(this, tr("游戏结束"),
-                     tr("<h2>5条命已经全部用完</h2>"));
+                     tr(""));
 }
 
 Node MoveNode(Node curr)
@@ -276,24 +278,19 @@ void GameWidget::loadImages()
   const QString numPath = "./img/num/";
   const QString monstersPath = "./img/monster/";
 
-  LIFE_IMAGE.load(imgPath + "life.png");
+  // LIFE_IMAGE.load(imgPath + "life.png");
   KEY_IMAGE.load(imgPath + "key.png");
-  KEY_IMAGE = KEY_IMAGE.scaled(WIDTH / 3 + 30, HEIGHT / 8 + 30);
   START_IMAGE.load(imgPath + "start.png");
-  START_IMAGE = START_IMAGE.scaled(GRID_SIZE, GRID_SIZE);
   END_IMAGE.load(imgPath + "end.png");
-  END_IMAGE = END_IMAGE.scaled(GRID_SIZE, GRID_SIZE);
 
   for (int i = 0; i < 10; ++i)
   {
     NUMBERS_IMAGE[i].load(numPath + QString::number(i) + ".png");
-    NUMBERS_IMAGE[i] = NUMBERS_IMAGE[i].scaled(45, 62);
   }
 
   for (int i = 1; i <= 6; ++i)
   {
     MONSTERS_IMAGE[i].load(monstersPath + "monster" + QString::number(i) + ".png");
-    MONSTERS_IMAGE[i] = MONSTERS_IMAGE[i].scaled(GRID_SIZE, GRID_SIZE);
   }
 }
 
@@ -314,8 +311,6 @@ void GameWidget::gameBegin()
 
   PLAYER_IMAGE.load(playerPath + "player" + QString::number(Player.type) + ".png");
 
-  PLAYER_IMAGE = PLAYER_IMAGE.scaled(GRID_SIZE - 2, GRID_SIZE - 2);
-
   countdown->start(1000); // 设置定时器每1000毫秒（1秒）触发一次
   monstersTimer->start(MONSTER_SPEED);
 }
@@ -327,12 +322,10 @@ void GameWidget::loadBGM(const QString &fileName)
   bgmPlayer->play();
 }
 
-void GameWidget::gameDraw()
+void GameWidget::gameDraw(QPainter &painter)
 {
-  QPainter painter(this);
   painter.setRenderHint(QPainter::Antialiasing);
 
-  // 设置背景颜色
   painter.fillRect(this->rect(), Qt::white);
 
   drawGameInfo(painter);
@@ -421,20 +414,27 @@ void GameWidget::drawGameInfo(QPainter &painter)
   painter.drawText(INFO_AREA_START_X + 20, yPos, "当前生命值为：");
   yPos += 30;
 
+  QString imagePath = "./img/game/life.png";
+  QPixmap lifePixmap(imagePath);
   for (int i = 0; i < LIFE; ++i)
   {
-    painter.drawPixmap(INFO_AREA_START_X + 20 + i * 70, yPos, LIFE_IMAGE);
+    painter.drawPixmap(INFO_AREA_START_X + 20 + i * 70, yPos, lifePixmap);
   }
 
-  yPos += 100; // 根据图标大小调整间距
+  yPos += 100; 
   // 绘制剩余时间
   painter.drawText(INFO_AREA_START_X + 20, yPos, "剩余时间为：");
   yPos += 30;
   QString timeString = QString::number(Time);
+  QSize targetSize(TIME_DIGIST_SIZE, TIME_DIGIST_SIZE);
+
+  const QString numPath = "./img/num/";
   for (int i = 0; i < timeString.length(); ++i)
   {
     int digit = timeString.at(i).digitValue();
-    painter.drawPixmap(INFO_AREA_START_X + centerAlign + i * 60, yPos, NUMBERS_IMAGE[digit].scaled(TIME_DIGIST_SIZE, TIME_DIGIST_SIZE));
+    imagePath = numPath + QString::number(digit) + ".png";
+    QPixmap numPixmap(imagePath);
+    painter.drawPixmap(INFO_AREA_START_X + centerAlign -30 + i * 60, yPos, numPixmap.scaled(60, 60));
   }
   yPos += 40;
 
@@ -467,6 +467,7 @@ void GameWidget::drawGameInfo(QPainter &painter)
 
 void GameWidget::drawGameMap(QPainter &painter)
 {
+  QSize targetSize(GRID_SIZE - 2, GRID_SIZE - 2);
   // 绘制怪物
   for (int i = 0; i < m; ++i)
   {
@@ -475,7 +476,7 @@ void GameWidget::drawGameMap(QPainter &painter)
     int y = Monsters[i].r * GRID_SIZE;
     if (Monsters[i].type >= 1 && Monsters[i].type <= MONSTERS_MAX_NUM)
     { // 确保怪物类型有效
-      painter.drawPixmap(QPoint(x, y), MONSTERS_IMAGE[Monsters[i].type]);
+      painter.drawPixmap(QPoint(x, y), MONSTERS_IMAGE[Monsters[i].type].scaled(targetSize, Qt::KeepAspectRatio, Qt::SmoothTransformation));
     }
     else
     {
@@ -485,7 +486,7 @@ void GameWidget::drawGameMap(QPainter &painter)
   }
 
   // 绘制玩家、墙壁、起点和终点
-  QSize targetSize(GRID_SIZE, GRID_SIZE);
+
   for (int i = 0; i < ROW; ++i)
   {
     for (int k = 0; k < COL; ++k)
@@ -550,4 +551,5 @@ void GameWidget::gameSuccess()
   QMessageBox::about(this, tr("闯关成功"),
                      tr("<h2>点击进入下一关</h2>"));
   gameState = GameState::GameIng;
+  gameBegin();
 }

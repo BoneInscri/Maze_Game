@@ -16,6 +16,9 @@
 #include <QMediaPlayer>
 #include <QFileInfo>
 #include <QTimer>
+#include <QCoreApplication>
+#include <QDebug>
+#include <QFileInfo>
 
 enum CellType
 {
@@ -77,7 +80,7 @@ private:
   void MovePlayer();
   void LifeReduce();
   void gameOver();
-  void gameDraw();
+  void gameDraw(QPainter &painter);
   void drawGameInfo(QPainter &painter);
   void drawGameMap(QPainter &painter);
   void gameAuto();
@@ -117,7 +120,7 @@ private:
   Node Start;
   Node Monsters[MONSTERS_MAX_NUM];
 
-  QPixmap LIFE_IMAGE;        // life image
+  // QPixmap LIFE_IMAGE;        // life image
   QPixmap NUMBERS_IMAGE[10]; // 十个数字图片
   QPixmap MONSTERS_IMAGE[7]; // 怪物图片
   QPixmap PLAYER_IMAGE;      // 角色图片
