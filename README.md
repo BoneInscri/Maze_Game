@@ -111,3 +111,18 @@ sh clean.sh
 - information of monsters : pos + dir
 
 ### 游戏效果
+
+<img src="README.assets/image-20240401205256282.png" alt="image-20240401205256282" style="zoom: 50%;" />
+
+<img src="README.assets/image-20240401205322732.png" alt="image-20240401205322732" style="zoom:67%;" />
+
+![image-20240401205338621](README.assets/image-20240401205338621.png)
+
+<img src="README.assets/image-20240401205351076.png" alt="image-20240401205351076" style="zoom:67%;" />
+
+演示视频：
+
+<img src="demo.gif" />
+
+
+

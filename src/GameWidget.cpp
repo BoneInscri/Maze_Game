@@ -473,12 +473,12 @@ void GameWidget::gameContinue()
   Time = preTime;
   Player = pre_Player;
   Mp[Player.r][Player.c] = PLAYER;
-  for (int i = 0; i < m; ++i)
-  {
-    Mp[Monsters[i].r][Monsters[i].c] = SPACE;
-    Monsters[i] = Monsters_cpy[i];
-    Mp[Monsters[i].r][Monsters[i].c] = MONSTER;
-  }
+  // for (int i = 0; i < m; ++i)
+  // {
+  //   Mp[Monsters[i].r][Monsters[i].c] = SPACE;
+  //   Monsters[i] = Monsters_cpy[i];
+  //   Mp[Monsters[i].r][Monsters[i].c] = MONSTER;
+  // }
   cur = 0;
 
   Mp[AutoPoint.r][AutoPoint.c] = SPACE;
@@ -506,11 +506,11 @@ void GameWidget::gameAuto()
     countdown->stop();
     monstersTimer->stop();
     AutoFindWay();
-    AutoPoint = Road[1];
+    AutoPoint = Road[0];
 
     gameState = GameAuto; // 进入自动游戏状态
 
-    autoTimer->start(50);
+    autoTimer->start(100);
     AutoButton->setText("继续操作");
   }
   else if (gameState == GameAuto)
@@ -522,6 +522,7 @@ void GameWidget::gameAuto()
 void GameWidget::AutoMove()
 {
   // qDebug() << "AutoMove";
+  assert(Mp[AutoPoint.r][AutoPoint.c] != MONSTER);
   Mp[AutoPoint.r][AutoPoint.c] = SPACE;
   AutoPoint = Road[cur++];
   Mp[AutoPoint.r][AutoPoint.c] = AUTO;
@@ -637,7 +638,7 @@ void GameWidget::drawGameMap(QPainter &painter)
     else
     {
       qDebug() << "Draw Monsters , Unknown Type : " << Monsters[i].type;
-      exit(0);
+      // exit(0);
     }
   }
 
