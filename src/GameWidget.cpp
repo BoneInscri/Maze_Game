@@ -19,7 +19,9 @@ GameWidget::GameWidget(int WIDTH, int HEIGHT, QWidget *parent) : QWidget(parent)
   countdown = new QTimer(this);
   connect(countdown, &QTimer::timeout, this, &GameWidget::TimeCountDown); // 游戏倒计时
   monstersTimer = new QTimer(this);
-  connect(monstersTimer, &QTimer::timeout, this, &GameWidget::MonstersMove); // 怪兽移动
+  connect(monstersTimer, &QTimer::timeout, this, &GameWidget::MonstersMove); // 手动操作 怪兽移动
+  autoTimer = new QTimer(this);
+  connect(autoTimer, &QTimer::timeout, this, &GameWidget::AutoMove); // 自动移动
 
   setFocusPolicy(Qt::StrongFocus);
 
@@ -38,8 +40,8 @@ void GameWidget::paintEvent(QPaintEvent *)
   {
   case GameIng:
   case GamePause:
+  case GameAuto:
     gameDraw(painter);
-
     break;
   case GameOver:
     this->hide();
@@ -189,6 +191,8 @@ void GameWidget::MovePlayer()
     gameState = GameSuccess;
     break;
   }
+  assert(next.r >= 0);
+  assert(next.c >= 0);
 }
 
 void GameWidget::loadMap(const QString &fileName)
@@ -231,6 +235,11 @@ void GameWidget::loadMap(const QString &fileName)
         Player.c = j;
         Start.r = i;
         Start.c = j;
+      }
+      if (Mp[i][j] == EXIT)
+      {
+        Exit.r = i;
+        Exit.c = j;
       }
     }
   }
@@ -371,9 +380,147 @@ void GameWidget::gamePause()
   }
 }
 
+void GameWidget::AutoFindWay()
+{
+  memset(To, 0, sizeof(To));
+
+  // EXIT的位置初始位置
+  int tx = Exit.r, ty = Exit.c;
+  To[0][Player.r][Player.c] = 1;
+  path_len = 0;
+
+  static const int deltaR[] = {-1, 1, 0, 0};
+  static const int deltaC[] = {0, 0, -1, 1};
+  while (To[path_len][tx][ty] == 0)
+  {
+    // 四个方向移动
+    for (int i = 0; i < ROW; i++)
+    {
+      for (int j = 0; j < COL; j++)
+      {
+        if (To[path_len][i][j] == 0)
+        {
+          // 不能走
+          continue;
+        }
+        for (int dir = 0; dir < 4; ++dir)
+        {
+          int newRow = i + deltaR[dir];
+          int newCol = j + deltaC[dir];
+          if (Mp[newRow][newCol] != WALL)
+          {
+            To[path_len + 1][newRow][newCol] = 1;
+          }
+        }
+      }
+    }
+    // 怪物存在的格子不能走
+    for (int i = 0; i < m; ++i)
+    {
+      To[path_len + 1][Monsters_cpy[i].r][Monsters_cpy[i].c] = 0;
+    }
+    // 怪物移动
+    for (int i = 0; i < m; ++i)
+    {
+      Node next = MoveNode(Monsters_cpy[i]);
+      if (Mp[next.r][next.c] == WALL)
+      {
+        Monsters_cpy[i].dir = getOppositeDirection(next.dir);
+      }
+      else
+      {
+        Monsters_cpy[i] = next;
+      }
+    }
+    // 怪物存在的格子不能走
+    for (int i = 0; i < m; ++i)
+    {
+      To[path_len + 1][Monsters_cpy[i].r][Monsters_cpy[i].c] = 0;
+    }
+
+    ++path_len;
+  }
+
+  // get answer
+  Node next;
+  next.r = tx;
+  next.c = ty;
+
+  for (int j = path_len; j > 0; --j)
+  {
+    Road[j] = next;
+    for (int dir = 0; dir < 4; ++dir)
+    {
+      int new_r = next.r + deltaR[dir];
+      int new_c = next.c + deltaC[dir];
+      if (To[j - 1][new_r][new_c] == 1)
+      {
+        next.r = new_r;
+        next.c = new_c;
+      }
+    }
+  }
+  Road[0] = next;
+  return;
+}
+
 void GameWidget::gameAuto()
 {
-  qDebug() << "自动寻路";
+  if (gameState == GameIng)
+  {
+    // save game State
+    preLIFE = LIFE;
+    preTime = Time;
+    for (int i = 0; i < m; ++i)
+    {
+      Monsters_cpy[i] = Monsters[i];
+    }
+
+    countdown->stop();
+    monstersTimer->stop();
+    AutoFindWay();
+    AutoPoint = Road[1];
+
+    gameState = GameAuto; // 进入自动游戏状态
+
+    autoTimer->start(50);
+    AutoButton->setText("继续操作");
+  }
+  else if (gameState == GameAuto)
+  {
+    AutoButton->setText("自动游戏");
+  }
+}
+
+void GameWidget::AutoMove()
+{
+  // qDebug() << "AutoMove";
+  static int cur = 1;
+  Mp[AutoPoint.r][AutoPoint.c] = SPACE;
+  AutoPoint = Road[cur++];
+  Mp[AutoPoint.r][AutoPoint.c] = AUTO;
+  MonstersMove();
+  if (cur == path_len)
+  {
+    autoTimer->stop();
+    // restore game state
+    LIFE = preLIFE;
+    Time = preTime;
+    for (int i = 0; i < m; ++i)
+    {
+      Mp[Monsters[i].r][Monsters[i].c] = SPACE;
+      Monsters[i] = Monsters_cpy[i];
+      Mp[Monsters[i].r][Monsters[i].c] = MONSTER;
+    }
+    cur = 0;
+    
+    Mp[AutoPoint.r][AutoPoint.c] = SPACE;
+    countdown->start(1000);
+    monstersTimer->start(MONSTER_SPEED);
+    
+    AutoButton->setText("自动寻路");
+    gameState = GameIng;
+  }
 }
 
 void GameWidget::setPlayerType(int type)
@@ -421,7 +568,7 @@ void GameWidget::drawGameInfo(QPainter &painter)
     painter.drawPixmap(INFO_AREA_START_X + 20 + i * 70, yPos, lifePixmap);
   }
 
-  yPos += 100; 
+  yPos += 100;
   // 绘制剩余时间
   painter.drawText(INFO_AREA_START_X + 20, yPos, "剩余时间为：");
   yPos += 30;
@@ -434,7 +581,7 @@ void GameWidget::drawGameInfo(QPainter &painter)
     int digit = timeString.at(i).digitValue();
     imagePath = numPath + QString::number(digit) + ".png";
     QPixmap numPixmap(imagePath);
-    painter.drawPixmap(INFO_AREA_START_X + centerAlign -30 + i * 60, yPos, numPixmap.scaled(60, 60));
+    painter.drawPixmap(INFO_AREA_START_X + centerAlign - 30 + i * 60, yPos, numPixmap.scaled(60, 60));
   }
   yPos += 40;
 
@@ -516,6 +663,10 @@ void GameWidget::drawGameMap(QPainter &painter)
       case MONSTER:
         // has handled
         break;
+      case AUTO:
+        painter.setBrush(QBrush(QColor(255, 0, 0)));
+        painter.drawRect(k * GRID_SIZE, i * GRID_SIZE, GRID_SIZE, GRID_SIZE);
+        break;
       default:
         qDebug() << "Draw Mp , Unknown Type : " << Mp[i][k];
         exit(0);
@@ -550,6 +701,9 @@ void GameWidget::gameSuccess()
 {
   QMessageBox::about(this, tr("闯关成功"),
                      tr("<h2>点击进入下一关</h2>"));
+  bgmPlayer->stop();
   gameState = GameState::GameIng;
+  countdown->stop();
+  monstersTimer->stop();
   gameBegin();
 }

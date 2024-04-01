@@ -27,7 +27,8 @@ enum CellType
   PLAYER,  // 2
   EXIT,    // 3
   MONSTER, // 4
-  BEGIN    // 5
+  BEGIN,   // 5
+  AUTO     // 6
 };
 
 enum DIR
@@ -44,7 +45,8 @@ enum GameState
   GameIng,    // 正在游戏 1
   GamePause,  // 游戏暂停 2
   GameOver,   // 游戏失败 3
-  GameSuccess // 闯关成功4
+  GameAuto,   // 自动寻路 4
+  GameSuccess // 闯关成功 5
 };
 
 struct Node
@@ -88,6 +90,8 @@ private:
   void gameExit();
   void gameWin();
   void gameSuccess();
+  void AutoFindWay();
+  void AutoMove();
 
   QPushButton *AutoButton;
   QPushButton *PauseButton;
@@ -118,6 +122,7 @@ private:
   Node Player;
   Node Pre_Player;
   Node Start;
+  Node Exit;
   Node Monsters[MONSTERS_MAX_NUM];
 
   // QPixmap LIFE_IMAGE;        // life image
@@ -132,6 +137,14 @@ private:
   QTimer *timer;
   QTimer *countdown;
   QTimer *monstersTimer;
+  QTimer *autoTimer; // 自动寻路定时器
+
+  // Auto game
+  int To[35 * 35][35][35];             // DP数组
+  int path_len;                        // 路径长度
+  Node Monsters_cpy[MONSTERS_MAX_NUM]; // 复制一群怪物（先找到一条路径）
+  Node Road[35 * 35];                  // 记录最优解的路径，从0开始
+  Node AutoPoint;
 
 private slots:
   void updateGameState();

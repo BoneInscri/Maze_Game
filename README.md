@@ -2,7 +2,7 @@
 
 这是一个迷宫小游戏，可以在Linux下运行。
 
-本身是大一程序设计实践大作业在Windows下用EasyX写的一个小游戏，且原先是使用在C语法基础上使用了部分的C++SLT模板，但考虑到之后的开发都在Linux下进行开发，故将代码整理了一下，转化为了Qt的C++版本，真打赢复活赛了。
+本身是大一程序设计实践大作业在Windows下用EasyX写的一个小游戏，且原先是使用在C语法基础上使用了部分的C++SLT模板，但考虑到之后的开发都在Linux下进行开发，故将代码整理了一下，转化为了Qt的C++版本，打赢复活赛了。
 
 ### 环境搭建
 
@@ -85,15 +85,11 @@ $ sudo apt-get install qttools5-dev-tools
 $ designer
 ```
 
-
-
 **Vscode 插件**
 
 C/C++ Extension Pack
 
 <img src="README.assets/image-20240331094825538.png" alt="image-20240331094825538" style="zoom: 67%;" />
-
-
 
 ### 项目构建并运行
 
@@ -101,14 +97,11 @@ C/C++ Extension Pack
 sh run.sh
 ```
 
-
 ### 项目清理
 
 ```
 sh clean.sh
 ```
-
-
 
 #### map.txt的格式说明
 
@@ -117,7 +110,4 @@ sh clean.sh
 - number of monsters
 - information of monsters : pos + dir
 
-
-
 ### 游戏效果
-
